@@ -4,7 +4,7 @@ const port = 5000;
 
 const bodyParser = require("body-parser");
 
-const User = require("./models/user");
+const { User } = require("./models/user");
 const config = require("./config/key");
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,8 +23,10 @@ mongoose
   })
   .catch((err) => console.log(err));
 
+//루트 uri
 app.get("/", (req, res) => res.send("hello world"));
 
+// 회원 가입
 app.post("/register", (req, res) => {
   const user = new User(req.body);
   user.save((err, doc) => {
