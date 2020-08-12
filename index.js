@@ -13,6 +13,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 const mongoose = require("mongoose");
+const { auth } = require("./middleware/auth");
 
 mongoose
   .connect(config.mongoURI, {
@@ -30,7 +31,7 @@ mongoose
 app.get("/", (req, res) => res.send("hello world"));
 
 // 회원 가입
-app.post("/register", (req, res) => {
+app.post("/api/users/register", (req, res) => {
   const user = new User(req.body);
   user.save((err, doc) => {
     if (err) return res.json({ success: false, err });
@@ -41,7 +42,7 @@ app.post("/register", (req, res) => {
 });
 
 // 로그인
-app.post("/login", (req, res) => {
+app.post("/api/users/login", (req, res) => {
   // 요청된 이메일을 데이터 베이스에서 찾는다
   User.findOne({ email: req.body.email }, (err, user) => {
     if (!user) {
@@ -69,6 +70,28 @@ app.post("/login", (req, res) => {
           .status(200)
           .json({ loginSuccess: true, userId: user._id });
       });
+    });
+  });
+});
+
+app.get("/api/users/auth", auth, (req, res) => {
+  res.status(200).json({
+    _id: req.user._id,
+    isAdmin: req.user.role === 0 ? false : true,
+    isAuth: true,
+    email: req.user.email,
+    name: req.user.name,
+    lastname: req.user.lastname,
+    role: req.user.role,
+    image: req.user.image,
+  });
+});
+
+app.get("/api/users/logout", auth, (req, res) => {
+  User.findOneAndUpdate({ _id: req.user._id }, { token: "" }, (err, user) => {
+    if (err) return res.json({ success: false, err });
+    return res.status(200).send({
+      success: true,
     });
   });
 });
