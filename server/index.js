@@ -29,6 +29,7 @@ mongoose
 
 //루트 uri
 app.get("/", (req, res) => res.send("hello world"));
+app.get("/api/hello", (req, res) => res.send("hello world"));
 
 // 회원 가입
 app.post("/api/users/register", (req, res) => {
